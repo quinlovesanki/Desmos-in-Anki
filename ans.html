@@ -3,10 +3,12 @@ html,body{margin:0;padding:0;background:transparent}
 body{font:bold 20px Georgia,"Times New Roman",serif;color:#3aa76d;white-space:nowrap;overflow:hidden}
 </style></head><body><span id="v">&hellip;</span>
 <script>
-var KEY="discShared",S=null;
-try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-document.getElementById("v").textContent = S ? S.xs.join(", ") : "?";
-setTimeout(function(){
-  try{ if(S){ S.used=true; localStorage.setItem(KEY,JSON.stringify(S)); } }catch(e){}
-}, 800);
+function show(xs){document.getElementById("v").textContent=xs.join(", ")}
+var BC=null;try{BC=new BroadcastChannel("discchan")}catch(e){}
+if(BC){
+  BC.onmessage=function(e){if(e.data&&e.data.xs)show(e.data.xs)};
+  BC.postMessage("ask");
+  setTimeout(function(){BC.postMessage("ask")},250);
+  setTimeout(function(){BC.postMessage("ask")},900);
+}
 </script></body></html>
