@@ -44,5 +44,9 @@ function draw(){
   else{s+=od(PX(x),PY(L));if(P.ty[i]==1)s+=fd(PX(x),PY(L+P.bp[i]))}});
  document.getElementById("g").innerHTML=s+"</svg>";
 }
-P=mk();draw();
+var KEY="discShared",S=null;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(S&&S.used===false){P=S}
+else{P=mk();P.used=false;try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}}
+draw();
 </script></body></html>
