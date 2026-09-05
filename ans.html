@@ -1,22 +1,30 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><style>
 html,body{margin:0;padding:0;background:transparent}
 body{font:bold 20px Georgia,"Times New Roman",serif;color:#3aa76d;white-space:nowrap;overflow:hidden}
-small{font:11px monospace;color:#888;font-weight:normal}
-</style></head><body><span id="v">&hellip;</span> <small id="d"></small>
+</style></head><body><span id="v">&hellip;</span>
 <script>
+var KEY="discShared",done=false;
+function consume(){
+  if(done)return; done=true;
+  try{
+    var S=JSON.parse(localStorage.getItem(KEY));
+    if(S){S.used=true;localStorage.setItem(KEY,JSON.stringify(S))}
+  }catch(e){}
+}
+function show(xs){
+  document.getElementById("v").textContent=xs.join(", ");
+  setTimeout(consume,700);
+}
 var BC=null;try{BC=new BroadcastChannel("discchan")}catch(e){}
-var myLS="none";
-try{localStorage.setItem("__t2","1");myLS=(localStorage.getItem("__t2")==="1")?"ok":"readfail"}catch(e){myLS="throw"}
 if(BC){
-  BC.onmessage=function(e){
-    var d=e.data;
-    if(d&&d.xs){
-      document.getElementById("v").textContent=d.xs.join(", ");
-      document.getElementById("d").textContent="[graphLS:"+d.ls+" reused:"+d.re+" ansLS:"+myLS+"]";
-    }
-  };
+  BC.onmessage=function(e){if(e.data&&e.data.xs)show(e.data.xs)};
   BC.postMessage("ask");
   setTimeout(function(){BC.postMessage("ask")},250);
   setTimeout(function(){BC.postMessage("ask")},900);
 }
+setTimeout(function(){
+  if(document.getElementById("v").textContent.indexOf("…")!==-1){
+    try{var S=JSON.parse(localStorage.getItem(KEY));if(S&&S.xs)show(S.xs)}catch(e){}
+  }
+},1200);
 </script></body></html>
