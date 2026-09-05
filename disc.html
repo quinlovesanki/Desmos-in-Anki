@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Discontinuity drill</title><style>
+html,body{margin:0;padding:0}
+body{font:14px -apple-system,Segoe UI,system-ui,sans-serif;text-align:center;background:#fff;color:#222}
+#a{margin:6px 8px 4px;line-height:1.5;min-height:1.2em}
+#a b{color:#c74440}
+.bar{margin-top:2px}
+button{font:inherit;padding:3px 11px;margin:0 3px;cursor:pointer;border:1px solid #bbb;border-radius:4px;background:#f6f6f6;color:inherit}
+button:hover{background:#ececec}
+svg{max-width:100%;height:auto}
+@media(prefers-color-scheme:dark){body{background:#2f2f31;color:#ddd}button{background:#3a3a3d;border-color:#555}button:hover{background:#46464a}}
+</style></head><body>
+<div id="g"></div>
+<div class="bar"><button id="s">Show answer</button><button id="n">New graph</button></div>
+<div id="a"></div>
+<script>
+var W=520,H=370,X0=-8,X1=8,Y0=-6,Y1=6,INK="#c74440",GAP=0.14,P;
+function r(a,b){return a+Math.random()*(b-a)}
+function PX(x){return (x-X0)/(X1-X0)*W}
+function PY(y){return H-(y-Y0)/(Y1-Y0)*H}
+function mk(){
+ var a=-4+Math.floor(Math.random()*3),b=a+2+Math.floor(Math.random()*3),c=b+2+Math.floor(Math.random()*3);
+ var xs=[a,b,c],ty=[0,0,0].map(function(){return Math.floor(Math.random()*3)});
+ var cv={a:r(0.6,1.8),k:r(0.5,1),p:r(0,6.283),m:r(-0.3,0.3),b:r(-1,1)};
+ var of=[0];ty.forEach(function(t){var p=of[of.length-1];of.push(t==2?p+(Math.random()<0.5?-1:1)*r(1.5,3):p)});
+ var bp=ty.map(function(t){return t==1?(Math.random()<0.5?-1:1)*r(1.5,2.5):0});
+ return {xs:xs,ty:ty,cv:cv,of:of,bp:bp};
+}
+function f(x){var c=P.cv;return c.a*Math.sin(c.k*x+c.p)+c.m*x+c.b}
+function ln(a,b,c,d,w,o){return '<line x1="'+a+'" y1="'+b+'" x2="'+c+'" y2="'+d+'" stroke="currentColor" stroke-width="'+w+'" opacity="'+o+'"/>'}
+function tx(a,b,t){return '<text x="'+a+'" y="'+b+'" font-size="12" fill="currentColor" opacity="0.65">'+t+'</text>'}
+function od(a,b){return '<circle cx="'+a.toFixed(1)+'" cy="'+b.toFixed(1)+'" r="4.5" fill="none" stroke="'+INK+'" stroke-width="2.3"/>'}
+function fd(a,b){return '<circle cx="'+a.toFixed(1)+'" cy="'+b.toFixed(1)+'" r="4.5" fill="'+INK+'"/>'}
+function fl(p){return p.length>1?'<polyline points="'+p.join(" ")+'" fill="none" stroke="'+INK+'" stroke-width="2.3" stroke-linecap="round"/>':''}
+function seg(L,R,o){var p=[],s="",N=240,i,x,y;
+ for(i=0;i<=N;i++){x=L+(R-L)*i/N;
+  if(x<L+GAP||x>R-GAP)continue;
+  y=f(x)+o;
+  if(y<Y0||y>Y1){s+=fl(p);p=[];continue}
+  p.push(PX(x).toFixed(1)+","+PY(y).toFixed(1))}
+ return s+fl(p)}
+function draw(){
+ var s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'">',i;
+ for(i=Math.ceil(X0);i<=X1;i++)s+=ln(PX(i),0,PX(i),H,i==0?1.4:1,i==0?0.7:0.14);
+ for(i=Math.ceil(Y0);i<=Y1;i++)s+=ln(0,PY(i),W,PY(i),i==0?1.4:1,i==0?0.7:0.14);
+ [-5,5].forEach(function(t){s+=tx(PX(t)+4,PY(0)+14,t);s+=tx(PX(0)+6,PY(t)-4,t)});
+ var bd=[X0].concat(P.xs).concat([X1]);
+ for(i=0;i<4;i++)s+=seg(bd[i],bd[i+1],P.of[i]);
+ P.xs.forEach(function(x,i){
+  var L=f(x)+P.of[i],R=f(x)+P.of[i+1];
+  if(P.ty[i]==2){s+=fd(PX(x),PY(L));s+=od(PX(x),PY(R))}
+  else{s+=od(PX(x),PY(L));if(P.ty[i]==1)s+=fd(PX(x),PY(L+P.bp[i]))}});
+ document.getElementById("g").innerHTML=s+"</svg>";
+ document.getElementById("a").innerHTML="";
+}
+function say(){
+ var L=["removable &mdash; hole, f undefined there","removable &mdash; f defined but &ne; the limit","jump &mdash; one-sided limits differ"];
+ document.getElementById("a").innerHTML="discontinuous at <b>x = "+P.xs.join(", ")+"</b><br>"+
+  P.xs.map(function(x,i){return "x = "+x+" : "+L[P.ty[i]]}).join("<br>");
+}
+function go(){P=mk();draw()}
+document.getElementById("s").onclick=say;
+document.getElementById("n").onclick=go;
+go();
+</script></body></html>
