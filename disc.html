@@ -44,10 +44,17 @@ function draw(){
   else{s+=od(PX(x),PY(L));if(P.ty[i]==1)s+=fd(PX(x),PY(L+P.bp[i]))}});
  document.getElementById("g").innerHTML=s+"</svg>";
 }
-P=mk();draw();
+var LS="none";
+try{localStorage.setItem("__t","1");LS=(localStorage.getItem("__t")==="1")?"ok":"readfail"}catch(e){LS="throw"}
+var SV=null;
+if(LS==="ok"){try{SV=JSON.parse(localStorage.getItem("discShared"))}catch(e){}}
+if(SV&&SV.used===false){P=SV;P.reused=1}else{P=mk();P.reused=0}
+if(LS==="ok"){try{localStorage.setItem("discShared",JSON.stringify({xs:P.xs,ty:P.ty,cv:P.cv,of:P.of,bp:P.bp,used:false}))}catch(e){}}
+draw();
 var BC=null;try{BC=new BroadcastChannel("discchan")}catch(e){}
 if(BC){
- BC.onmessage=function(e){if(e.data==="ask")BC.postMessage({xs:P.xs})};
- BC.postMessage({xs:P.xs});
+ var msg={xs:P.xs,ls:LS,re:P.reused};
+ BC.onmessage=function(e){if(e.data==="ask")BC.postMessage(msg)};
+ BC.postMessage(msg);
 }
 </script></body></html>
