@@ -1,18 +1,19 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><style>
-html,body{margin:0;padding:0;background:transparent}
-body{font:bold 20px Georgia,"Times New Roman",serif;color:#3aa76d;white-space:nowrap;overflow:hidden}
+html,body{margin:0;padding:0;background:transparent;overflow:hidden}
+body{font:bold 20px Georgia,"Times New Roman",serif;color:#3aa76d;white-space:nowrap;text-align:center;line-height:26px}
 </style></head><body><span id="v">&hellip;</span>
 <script>
-var KEY="discShared",done=false;
+var KEY="discShared";
+var IDX=parseInt((location.search.match(/[?&]i=(-?\d+)/)||[])[1],10);
+if(isNaN(IDX))IDX=-1;
+var done=false;
 function consume(){
-  if(done)return; done=true;
-  try{
-    var S=JSON.parse(localStorage.getItem(KEY));
-    if(S){S.used=true;localStorage.setItem(KEY,JSON.stringify(S))}
-  }catch(e){}
+  if(done||IDX!==0)return; done=true;
+  try{var S=JSON.parse(localStorage.getItem(KEY));if(S){S.used=true;localStorage.setItem(KEY,JSON.stringify(S))}}catch(e){}
 }
 function show(xs){
-  document.getElementById("v").textContent=xs.join(", ");
+  var a=xs.slice().sort(function(p,q){return p-q});
+  document.getElementById("v").textContent = IDX>=0 ? a[IDX] : a.join(", ");
   setTimeout(consume,700);
 }
 var BC=null;try{BC=new BroadcastChannel("discchan")}catch(e){}
