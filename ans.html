@@ -1,12 +1,20 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><style>
 html,body{margin:0;padding:0;background:transparent}
 body{font:bold 20px Georgia,"Times New Roman",serif;color:#3aa76d;white-space:nowrap;overflow:hidden}
-</style></head><body><span id="v">&hellip;</span>
+small{font:11px monospace;color:#888;font-weight:normal}
+</style></head><body><span id="v">&hellip;</span> <small id="d"></small>
 <script>
-function show(xs){document.getElementById("v").textContent=xs.join(", ")}
 var BC=null;try{BC=new BroadcastChannel("discchan")}catch(e){}
+var myLS="none";
+try{localStorage.setItem("__t2","1");myLS=(localStorage.getItem("__t2")==="1")?"ok":"readfail"}catch(e){myLS="throw"}
 if(BC){
-  BC.onmessage=function(e){if(e.data&&e.data.xs)show(e.data.xs)};
+  BC.onmessage=function(e){
+    var d=e.data;
+    if(d&&d.xs){
+      document.getElementById("v").textContent=d.xs.join(", ");
+      document.getElementById("d").textContent="[graphLS:"+d.ls+" reused:"+d.re+" ansLS:"+myLS+"]";
+    }
+  };
   BC.postMessage("ask");
   setTimeout(function(){BC.postMessage("ask")},250);
   setTimeout(function(){BC.postMessage("ask")},900);
