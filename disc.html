@@ -1,17 +1,10 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><title>Discontinuity drill</title><style>
 html,body{margin:0;padding:0}
 body{font:14px -apple-system,Segoe UI,system-ui,sans-serif;text-align:center;background:#fff;color:#222}
-#a{margin:6px 8px 4px;line-height:1.5;min-height:1.2em}
-#a b{color:#c74440}
-.bar{margin-top:2px}
-button{font:inherit;padding:3px 11px;margin:0 3px;cursor:pointer;border:1px solid #bbb;border-radius:4px;background:#f6f6f6;color:inherit}
-button:hover{background:#ececec}
 svg{max-width:100%;height:auto}
-@media(prefers-color-scheme:dark){body{background:#2f2f31;color:#ddd}button{background:#3a3a3d;border-color:#555}button:hover{background:#46464a}}
+@media(prefers-color-scheme:dark){body{background:#2f2f31;color:#ddd}}
 </style></head><body>
 <div id="g"></div>
-<div class="bar"><button id="s">Show answer</button><button id="n">New graph</button></div>
-<div id="a"></div>
 <script>
 var W=520,H=370,X0=-8,X1=8,Y0=-6,Y1=6,INK="#c74440",GAP=0.14,P;
 function r(a,b){return a+Math.random()*(b-a)}
@@ -50,15 +43,6 @@ function draw(){
   if(P.ty[i]==2){s+=fd(PX(x),PY(L));s+=od(PX(x),PY(R))}
   else{s+=od(PX(x),PY(L));if(P.ty[i]==1)s+=fd(PX(x),PY(L+P.bp[i]))}});
  document.getElementById("g").innerHTML=s+"</svg>";
- document.getElementById("a").innerHTML="";
 }
-function say(){
- var L=["removable &mdash; hole, f undefined there","removable &mdash; f defined but &ne; the limit","jump &mdash; one-sided limits differ"];
- document.getElementById("a").innerHTML="discontinuous at <b>x = "+P.xs.join(", ")+"</b><br>"+
-  P.xs.map(function(x,i){return "x = "+x+" : "+L[P.ty[i]]}).join("<br>");
-}
-function go(){P=mk();draw()}
-document.getElementById("s").onclick=say;
-document.getElementById("n").onclick=go;
-go();
+P=mk();draw();
 </script></body></html>
